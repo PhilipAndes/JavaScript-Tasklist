@@ -18,6 +18,9 @@ function loadEventListeners() {
 
     // Clear task event
     clearBtn.addEventListener('click', clearTasks);
+
+    // Filter task event
+    filter.addEventListener('keyup', filterTasks);
 }
 
 //Add Task
@@ -73,4 +76,20 @@ function clearTasks() {
         //while there still is a first child, meaning while there still is something in the list
         taskList.removeChild(taskList.firstChild);
     }
+}
+
+// Filter Tasks
+function filterTasks(e) { // e = the event paramater
+    const text = e.target.value.toLowerCase(); //this will give us whatever is typed in (always in lower case)
+    
+    //take all of the list items with the classname collection-item and loop true these with a forEach loop, the reason we can use this is because querySelectorAll returns a node list
+    document.querySelectorAll('.collection-item').forEach
+    (function(task){
+        const item = task.firstChild.textContent;
+        if(item.toLowerCase().indexOf(text) != -1){ // if item to lower case, because we also did this with the filter value, then the text that is being typed we want to pass into indexOf, now if there is no match it's gonna equal -1, so we want to say, if it's not equal to -1 then we want that task to show
+            task.style.display = 'block';
+        } else { // Else if there is no match, we want to hide it 
+            task.style.display = 'none';
+        }
+    });
 }
