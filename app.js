@@ -10,6 +10,9 @@ loadEventListeners();
 
 // Load all event listeners
 function loadEventListeners() {
+    //DOM load event
+    document.addEventListener('DOMContentLoaded', getTasks); //this event will be called right away after the DOM has loaded, and we gonna get getTasks
+
     // Add task event
     form.addEventListener('submit', addTask);
 
@@ -21,6 +24,38 @@ function loadEventListeners() {
 
     // Filter task event
     filter.addEventListener('keyup', filterTasks);
+}
+
+// Get Tasks from local storage
+function getTasks() {
+    let tasks;
+    // Check local storage to see if there are tasks in there with a if statement
+    if(localStorage.getItem('tasks') === null ){// so if tasks is equal to null, which means there is nothing in there. Then we set the tasks variable to an empty array
+        tasks = [];
+    } else { // Else we want to set tasks to whatever is in local storage, and remember local storage can only store strings, so we gonna have to parse it as JSON when it comes out
+        tasks = JSON.parse(localStorage.getItem('tasks'));
+    }
+
+    // Then we want to loop true the tasks that are there with a forEach loop
+    tasks.forEach(function(task){
+        // Create li element when task added
+        const li = document.createElement('li');
+        // Add class
+        li.className = 'collection-item';
+        // Create text node and append to li
+        li.appendChild(document.createTextNode(task));
+        // Create new link (the delete icon from fontawesome)
+        const link = document.createElement('a');
+        // Add class
+        link.className = 'delete-item secondary-content'; //if you want something on the right from the list item and materialize you need the secondary-content class
+        // Add icon html
+        link.innerHTML = '<i class="fa fa-remove"></i>';// this is the x-mark icon from fontawesome
+        // Append the link to li
+        li.appendChild(link);
+
+        // Append the li to ul
+        taskList.appendChild(li);
+    });
 }
 
 //Add Task
@@ -44,13 +79,32 @@ function addTask(e) {
     // Append the link to li
     li.appendChild(link);
 
-    // Append the li to the UI
+    // Append the li to ul
     taskList.appendChild(li);
+
+    // Store in local storage
+    storeTaskInLocalStorage(taskInput.value); //we want to store the value from the taskInput
 
     // Clear the input
     taskInput.value = '';
 
     e.preventDefault(); //prevent form submit
+}
+
+// Store task
+function storeTaskInLocalStorage(task) {
+    let tasks;
+    // Check local storage to see if there are tasks in there with a if statement
+    if(localStorage.getItem('tasks') === null ){// so if tasks is equal to null, which means there is nothing in there. Then we set the tasks variable to an empty array
+        tasks = [];
+    } else { // Else we want to set tasks to whatever is in local storage, and remember local storage can only store strings, so we gonna have to parse it as JSON when it comes out
+        tasks = JSON.parse(localStorage.getItem('tasks'));
+    }
+    // After that we want to push on to that variable so
+    tasks.push(task);
+
+    //after that we want to set it back to localstorage (as string) so
+    localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
 // Remove Task
@@ -62,8 +116,31 @@ function removeTask(e) {
     //We also want a conformation when we delete something from the list so we use a if statement. 
         if(confirm('Are You Sure?')) {
             e.target.parentElement.parentElement.remove();
+
+            // Right after we remove it from the DOM we also want to delete it from local storage
+            removeTaskFromLocalStorage(e.target.parentElement.parentElement);//This looks weird as we dont have an actual ID to put in, so we get the element from the DOM
         }
     }
+}
+
+// Remove from Local Storage
+function removeTaskFromLocalStorage(taskItem) {
+    // Check local storage to see if there are tasks in there with a if statement
+    if(localStorage.getItem('tasks') === null ){// so if tasks is equal to null, which means there is nothing in there. Then we set the tasks variable to an empty array
+        tasks = [];
+    } else { // Else we want to set tasks to whatever is in local storage, and remember local storage can only store strings, so we gonna have to parse it as JSON when it comes out
+        tasks = JSON.parse(localStorage.getItem('tasks'));
+    }
+
+    //Then we going to loop true the tasks
+    tasks.forEach(function(task, index){
+        if(taskItem.textContent === task){ //with this if statement we want to check if it equals the current task in the iteration, if it does, we know that is the one we want to delete, so we gonna say
+            tasks.splice(index, 1); //we can get the index, by setting it as the second paramater on the forEach callback, the 1 says we want to delete 1 from the index 
+
+        }
+    });
+    //then all we have to do is go under the forEach and set local storage again
+    localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
 // Clear Tasks
@@ -76,6 +153,14 @@ function clearTasks() {
         //while there still is a first child, meaning while there still is something in the list
         taskList.removeChild(taskList.firstChild);
     }
+
+    //Clear from local storage
+    clearTasksFromLocalStorage();
+}
+
+//Clear tasks from local storage
+function clearTasksFromLocalStorage() {
+    localStorage.clear(); //this will clear out everything from local storage
 }
 
 // Filter Tasks
