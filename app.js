@@ -15,6 +15,9 @@ function loadEventListeners() {
 
     // Remove task event
     taskList.addEventListener('click', removeTask);
+
+    // Clear task event
+    clearBtn.addEventListener('click', clearTasks);
 }
 
 //Add Task
@@ -57,5 +60,17 @@ function removeTask(e) {
         if(confirm('Are You Sure?')) {
             e.target.parentElement.parentElement.remove();
         }
+    }
+}
+
+// Clear Tasks
+function clearTasks() {
+    //One way of doing this is like this: taskList.innerHTML = '';
+
+    //Or we can loop true with a do while loop, and remove each one which is a faster way
+    while(taskList.firstChild) { //firstChild is gonna get the first child of the tasklist
+
+        //while there still is a first child, meaning while there still is something in the list
+        taskList.removeChild(taskList.firstChild);
     }
 }
